@@ -1,7 +1,6 @@
 # esia-oauth2
 ## Модуль для доступа к ЕСИА REST сервису (https://esia.gosuslugi.ru)
-Основан на коде esia-connector https://github.com/eigenmethod/esia-connector
-Лицензия: https://github.com/eigenmethod/esia-connector/blob/master/LICENSE.txt 
+Основан на коде esia-connector https://github.com/eigenmethod/esia-connector, лицензия: https://github.com/eigenmethod/esia-connector/blob/master/LICENSE.txt 
 
 ### Позволяет:
 * Сформировать ссылку для перехода на сайт ЕСИА с целью авторизации
