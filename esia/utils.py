@@ -48,7 +48,7 @@ def smime_sign(certificate_file, private_key_file, data, backend='m2crypto'):
     :return: открепленная подпись
     :rtype: str
     """
-    if backend == 'm2crypto':
+    if backend == 'm2crypto' or backend is None:
         from M2Crypto import SMIME, BIO
 
         if not isinstance(data, bytes):
@@ -86,18 +86,19 @@ def smime_sign(certificate_file, private_key_file, data, backend='m2crypto'):
         raise SignBackendError('Unknown signature backend. Use openssl or m2crypto value.')
 
 
-def sign_params(params, certificate_file, private_key_file):
+def sign_params(params, certificate_file, private_key_file, backend='m2crypto'):
     """
     Подписывает параметры запроса алогритмом sha256 и добавляет в params ключ client_secret.
     Подпись основывается на полях: `scope`, `timestamp`, `client_id`, `state`.
     :param dict params: параметры запроса
     :param str certificate_file: путь к сертификату
     :param str private_key_file: путь к приватному ключу
+    :param str backend: (optional) бэкенд используемый для подписи (m2crypto|openssl)
     :return: подписанные параметры запроса
     :rtype: dict
     """
     plaintext = params.get('scope', '') + params.get('timestamp', '') + params.get('client_id', '') + params.get('state', '')
-    raw_client_secret = smime_sign(certificate_file, private_key_file, plaintext)
+    raw_client_secret = smime_sign(certificate_file, private_key_file, plaintext, backend)
     params.update(
         client_secret=base64.urlsafe_b64encode(raw_client_secret).decode('utf-8'),
     )

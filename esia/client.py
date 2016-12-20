@@ -18,7 +18,7 @@ from .utils import get_timestamp, sign_params, make_request
 
 class EsiaSettings(object):
     def __init__(self, esia_client_id, redirect_uri, certificate_file, private_key_file, 
-        esia_service_url, esia_scope, esia_token_check_key=None):
+        esia_service_url, esia_scope, crypto_backend='m2crypto', esia_token_check_key=None):
         """
         Класс настроек ЕСИА
         :param str esia_client_id: идентификатор клиента в ЕСИА (указывается в заявке)
@@ -29,6 +29,7 @@ class EsiaSettings(object):
         :param str esia_scope: список scope, разделенный пробелами, доступный клиенту (указывается в заявке)
         :param str or None esia_token_check_key: путь к публичному ключу для проверки JWT (access token)
             необходимо запросить у технической поддержки ЕСИА
+        :param str crypto_backend: optional, задает крипто бэкенд, может принимать значения: m2crypto, openssl
         """
         self.esia_client_id = esia_client_id
         self.redirect_uri = redirect_uri
@@ -37,6 +38,7 @@ class EsiaSettings(object):
         self.esia_service_url = esia_service_url
         self.esia_scope = esia_scope
         self.esia_token_check_key = esia_token_check_key
+        self.crypto_backend = crypto_backend
 
 
 class EsiaConfig(EsiaSettings):
@@ -59,8 +61,13 @@ class EsiaConfig(EsiaSettings):
                 'private_key_file': base_dir + '/' + conf.get('esia', 'PRIV_KEY_FILE'),
                 'esia_service_url': conf.get('esia', 'SERVICE_URL'),
                 'esia_scope': conf.get('esia', 'SCOPE'),
-                'esia_token_check_key': base_dir + '/' + conf.get('esia', 'JWT_CHECK_KEY'),
+                'crypto_backend': conf.get('esia', 'CRYPTO_BACKEND'),
             }
+
+            token_check_key = conf.get('esia', 'JWT_CHECK_KEY')
+            if token_check_key:
+                kwargs['esia_token_check_key'] = base_dir + '/' + token_check_key
+            
             super(EsiaConfig, self).__init__(*args, **kwargs)
         else:
             raise ConfigFileError("Config file not exists or not readable!")
@@ -102,7 +109,8 @@ class EsiaAuth(object):
 
         params = sign_params(params,
             certificate_file=self.settings.certificate_file,
-            private_key_file=self.settings.private_key_file
+            private_key_file=self.settings.private_key_file,
+            backend=self.crypto_backend
         )
 
         params = urlencode(sorted(params.items()))  # sorted needed to make uri deterministic for tests.
