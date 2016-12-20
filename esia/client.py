@@ -67,7 +67,7 @@ class EsiaConfig(EsiaSettings):
             token_check_key = conf.get('esia', 'JWT_CHECK_KEY')
             if token_check_key:
                 kwargs['esia_token_check_key'] = base_dir + '/' + token_check_key
-            
+
             super(EsiaConfig, self).__init__(*args, **kwargs)
         else:
             raise ConfigFileError("Config file not exists or not readable!")
@@ -110,7 +110,7 @@ class EsiaAuth(object):
         params = sign_params(params,
             certificate_file=self.settings.certificate_file,
             private_key_file=self.settings.private_key_file,
-            backend=self.crypto_backend
+            backend=self.settings.crypto_backend
         )
 
         params = urlencode(sorted(params.items()))  # sorted needed to make uri deterministic for tests.
