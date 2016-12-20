@@ -12,7 +12,7 @@ import tempfile
 import pytz
 import requests
 
-from .exceptions import IncorrectJsonError, SignBackendError, HttpError
+from .exceptions import IncorrectJsonError, CryptoBackendError, HttpError
 
 
 def make_request(url, method='GET', headers=None, data=None):
@@ -45,6 +45,7 @@ def smime_sign(certificate_file, private_key_file, data, backend='m2crypto'):
     :param str private_key_file: путь к приватному ключу
     :param str data: подписываемые данные
     :param str backend: (optional) бэкенд используемый для подписи (m2crypto|openssl)
+    :raises CryptoBackendError: если неверно указан backend
     :return: открепленная подпись
     :rtype: str
     """
@@ -83,7 +84,7 @@ def smime_sign(certificate_file, private_key_file, data, backend='m2crypto'):
         os.unlink(destination_path)
         return signed_message
     else:
-        raise SignBackendError('Unknown signature backend. Use openssl or m2crypto value.')
+        raise CryptoBackendError('Unknown cryptography backend. Use openssl or m2crypto value.')
 
 
 def sign_params(params, certificate_file, private_key_file, backend='m2crypto'):
@@ -94,6 +95,7 @@ def sign_params(params, certificate_file, private_key_file, backend='m2crypto'):
     :param str certificate_file: путь к сертификату
     :param str private_key_file: путь к приватному ключу
     :param str backend: (optional) бэкенд используемый для подписи (m2crypto|openssl)
+    :raises CryptoBackendError: если неверно указан backend
     :return: подписанные параметры запроса
     :rtype: dict
     """

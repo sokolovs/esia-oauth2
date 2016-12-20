@@ -23,7 +23,7 @@ class HttpError(EsiaError, requests.exceptions.HTTPError):
     pass
 
 
-class SignBackendError(Exception):
+class CryptoBackendError(Exception):
     pass
 
 
