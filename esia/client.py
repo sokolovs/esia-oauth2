@@ -148,7 +148,8 @@ class EsiaAuth(object):
 
         params = sign_params(params,
             certificate_file=self.settings.certificate_file,
-            private_key_file=self.settings.private_key_file
+            private_key_file=self.settings.private_key_file,
+            backend=self.settings.crypto_backend
         )
 
         url = '{base_url}{token_url}'.format(
