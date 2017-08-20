@@ -82,6 +82,7 @@ url(r'^esia/callback/$', views.esia_callback, name='esia_callback'),
 ```python
 import json
 from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.views import logout
 from esia.client import EsiaConfig, EsiaAuth
 
 ESIA_SETTINGS = EsiaConfig('/full/path/to/esia.ini')
@@ -90,6 +91,12 @@ def esia_login(request):
     esia_auth = EsiaAuth(ESIA_SETTINGS)
     esia_login_url = esia_auth.get_auth_url()
     return HttpResponseRedirect(esia_login_url)
+
+def esia_logout(request):
+    kwargs = {}
+    esia_auth = EsiaAuth(ESIA_SETTINGS)
+    kwargs['next_page'] = esia_auth.get_logout_url()
+    return logout(request, **kwargs)
 
 def esia_callback(request):
     esia_auth = EsiaAuth(ESIA_SETTINGS)
