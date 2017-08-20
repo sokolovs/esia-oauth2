@@ -6,7 +6,7 @@
 import os
 import os.path
 import uuid
-from urllib import urlencode
+from urllib import urlencode, quote_plus
 from ConfigParser import RawConfigParser
 
 import jwt
@@ -17,8 +17,9 @@ from .utils import get_timestamp, sign_params, make_request
 
 
 class EsiaSettings(object):
-    def __init__(self, esia_client_id, redirect_uri, certificate_file, private_key_file, 
-        esia_service_url, esia_scope, crypto_backend='m2crypto', esia_token_check_key=None):
+    def __init__(self, esia_client_id, redirect_uri, certificate_file,
+        private_key_file, esia_service_url, esia_scope, crypto_backend='m2crypto',
+        esia_token_check_key=None, logout_redirect_uri=None):
         """
         Класс настроек ЕСИА
         :param str esia_client_id: идентификатор клиента в ЕСИА (указывается в заявке)
@@ -39,6 +40,7 @@ class EsiaSettings(object):
         self.esia_scope = esia_scope
         self.esia_token_check_key = esia_token_check_key
         self.crypto_backend = crypto_backend
+        self.logout_redirect_uri = logout_redirect_uri
 
 
 class EsiaConfig(EsiaSettings):
@@ -68,6 +70,9 @@ class EsiaConfig(EsiaSettings):
             if token_check_key:
                 kwargs['esia_token_check_key'] = base_dir + '/' + token_check_key
 
+            if conf.has_option('esia', 'LOGOUT_REDIRECT_URI'):
+                kwargs['logout_redirect_uri'] = conf.get('esia', 'LOGOUT_REDIRECT_URI')
+
             super(EsiaConfig, self).__init__(*args, **kwargs)
         else:
             raise ConfigFileError("Config file not exists or not readable!")
@@ -80,6 +85,7 @@ class EsiaAuth(object):
     _ESIA_ISSUER_NAME = 'http://esia.gosuslugi.ru/'
     _AUTHORIZATION_URL = '/aas/oauth2/ac'
     _TOKEN_EXCHANGE_URL = '/aas/oauth2/te'
+    _LOGOUT_URL = '/idp/ext/Logout'
 
     def __init__(self, settings):
         """
@@ -170,6 +176,25 @@ class EsiaAuth(object):
             oid=self._get_user_id(payload),
             settings=self.settings
         )
+
+    def get_logout_url(self, redirect_uri=None):
+        """
+        Возвращает URL для выхода пользователя из ЕСИА (логаут)
+        :param str or None redirect_uri: URI, по которому будет перенаправлен браузер после логаута
+        :return: url
+        :rtype: str
+        """
+        logout_url = '{base_url}{logout_url}?client_id={client_id}'.format(
+            base_url=self.settings.esia_service_url,
+            logout_url=self._LOGOUT_URL,
+            client_id=self.settings.esia_client_id
+        )
+
+        redirect = (redirect_uri or self.settings.logout_redirect_uri)
+        if redirect:
+            logout_url += '&redirect_url={redirect}'.format(redirect=quote_plus(redirect))
+
+        return logout_url
 
     @staticmethod
     def _parse_token(token):
