@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # Код основан на пакете esia-connector
 # https://github.com/eigenmethod/esia-connector
-# Лицензия: https://github.com/eigenmethod/esia-connector/blob/master/LICENSE.txt
+# Лицензия:
+#   https://github.com/eigenmethod/esia-connector/blob/master/LICENSE.txt
 # Copyright (c) 2015, Septem Capital
 import jwt
+
 import requests.exceptions
 
 
