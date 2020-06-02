@@ -96,7 +96,8 @@ class EsiaConfig(EsiaSettings):
                 'certificate_file': None,
                 'private_key_file': None,
                 'csp_cert_thumbprint': None,
-                'csp_container_pwd': None
+                'csp_container_pwd': None,
+                'ssl_verify': True
             }
 
             # Openssl, M2Crypto params
@@ -122,6 +123,10 @@ class EsiaConfig(EsiaSettings):
             if conf.has_option('esia', 'LOGOUT_REDIRECT_URI'):
                 redir = conf.get('esia', 'LOGOUT_REDIRECT_URI')
                 kwargs['logout_redirect_uri'] = redir
+
+            if conf.has_option('esia', 'SSL_VERIFY'):
+                ssl_verify = conf.getboolean('esia', 'SSL_VERIFY')
+                kwargs['ssl_verify'] = ssl_verify
 
             super(EsiaConfig, self).__init__(*args, **kwargs)
         else:
