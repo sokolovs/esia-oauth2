@@ -17,7 +17,7 @@ import requests
 from .exceptions import CryptoBackendError, HttpError, IncorrectJsonError
 
 
-def make_request(url, method='GET', headers=None, data=None):
+def make_request(url, method='GET', headers=None, data=None, verify=True):
     """
     Выполняет запрос по заданному URL и возвращает dict на основе JSON-ответа
 
@@ -26,6 +26,8 @@ def make_request(url, method='GET', headers=None, data=None):
     :param dict headers: (optional) массив HTTP-заголовков, по умолчанию None
     :param dict data: (optional) массив данных передаваемых в запросе,
         по умолчанию None
+    :param boolean verify: optional, производить ли верификацию
+        ssl-сертификата при запросае
     :return: dict на основе JSON-ответа
     :rtype: dict
     :raises HttpError: если выбрасыватеся исключение requests.HTTPError
@@ -33,7 +35,8 @@ def make_request(url, method='GET', headers=None, data=None):
         корректно прочитан
     """
     try:
-        response = requests.request(method, url, headers=headers, data=data)
+        response = requests.request(
+            method, url, headers=headers, data=data, verify=verify)
         response.raise_for_status()
         return json.loads(response.content)
     except requests.HTTPError as e:

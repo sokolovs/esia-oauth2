@@ -27,7 +27,7 @@ class EsiaSettings(object):
             private_key_file, esia_service_url, esia_scope,
             crypto_backend='m2crypto', esia_token_check_key=None,
             logout_redirect_uri=None, csp_cert_thumbprint='',
-            csp_container_pwd=''):
+            csp_container_pwd='', ssl_verify=True):
         """
         Класс настроек ЕСИА
         :param str esia_client_id: идентификатор клиента в ЕСИА
@@ -50,6 +50,8 @@ class EsiaSettings(object):
             certmgr --list), например: 5c84a6a58bbeb6578ff7d26f4ea65b6de5f9f5b8
         :param str csp_container_pwd: optional, пароль для контейнера
             закрытого ключа
+        :param boolean ssl_verify: optional, производить ли верификацию
+            ssl-сертификата при запросах к сервису ЕСИА?
         """
         self.esia_client_id = esia_client_id
         self.redirect_uri = redirect_uri
@@ -62,6 +64,7 @@ class EsiaSettings(object):
         self.logout_redirect_uri = logout_redirect_uri
         self.csp_cert_thumbprint = csp_cert_thumbprint
         self.csp_container_pwd = csp_container_pwd
+        self.ssl_verify = ssl_verify
 
         if self.crypto_backend == 'csp' and not self.csp_cert_thumbprint:
             raise CryptoBackendError(
@@ -218,7 +221,9 @@ class EsiaAuth(object):
             token_url=self._TOKEN_EXCHANGE_URL
         )
 
-        response_json = make_request(url=url, method='POST', data=params)
+        response_json = make_request(
+            url=url, method='POST', data=params,
+            verify=self.settings.ssl_verify)
         id_token = response_json['id_token']
 
         if validate_token:
@@ -327,7 +332,9 @@ class EsiaInformationConnector(object):
         else:
             headers['Accept'] = 'application/json'
 
-        return make_request(url=endpoint_url, headers=headers)
+        return make_request(
+            url=endpoint_url, headers=headers,
+            verify=self.settings.ssl_verify)
 
     def get_person_main_info(self, accept_schema=None):
         """
