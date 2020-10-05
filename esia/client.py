@@ -8,9 +8,9 @@ import os
 import os.path
 import uuid
 
-from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 
-from urllib import quote_plus, urlencode
+from urllib.parse import quote_plus, urlencode
 
 import jwt
 from jwt.exceptions import InvalidTokenError
