@@ -147,3 +147,26 @@ def esia_callback(request):
     return HttpResponse(json.dumps(data, cls=json.JSONEncoder, ensure_ascii=False, indent=4),
         content_type='application/json')
 ```
+
+
+### Additional settings
+http://pushorigin.ru/cryptopro/cryptcp
+
+Cryptopro server:\n
+```
+tar -xzf linux-amd64.tgz
+cd linux-amd64
+sudo ./install.sh
+
+
+ln -s /opt/cprocsp/bin/amd64/certmgr
+ln -s /opt/cprocsp/bin/amd64/cpverify
+ln -s /opt/cprocsp/bin/amd64/cryptcp
+ln -s /opt/cprocsp/bin/amd64/csptest
+ln -s /opt/cprocsp/bin/amd64/csptestf
+ln -s /opt/cprocsp/bin/amd64/der2xer
+ln -s /opt/cprocsp/bin/amd64/inittst
+ln -s /opt/cprocsp/bin/amd64/wipefile
+ln -s /opt/cprocsp/sbin/amd64/cpconfig
+
+```
