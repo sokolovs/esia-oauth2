@@ -121,8 +121,9 @@ def csp_sign(thumbprint, password, data):
     destination_file.close()
     destination_path = destination_file.name
 
+    print ("test")
     cmd = (
-        "cryptcp -sign -nochain -der -nocert -pin {password} "
+        "cryptcp -signf -nochain -der -cert -pin {password} "
         "{f_in} {f_out} -thumbprint {thumbprint} 2>&1 >/dev/null")
     os.system(cmd.format(
         password=password,
