@@ -121,9 +121,21 @@ def csp_sign(thumbprint, password, data):
     destination_file.close()
     destination_path = destination_file.name
 
+    # cmd = (
+    #     "cryptcp -sign -nochain -der -nocert -pin {password} "
+    #     "{f_in} {f_out} -thumbprint {thumbprint} 2>&1 >/dev/null")
+
+    # Create detached PKCS#7 sinature
+    # csptest -sfsign -sign -detached -in signed_file.txt -out sign.p7b \
+    #   -my 16d9487839b629f327c659a854d5283e24accc2d -password 1
+
+    # Verify detached PKCS#7 sinature
+    # csptest -sfsign -verify -detached -in signed_file.txt \
+    #   -signature sign.p7b -my 16d9487839b629f327c659a854d5283e24accc2d
+
     cmd = (
-        "cryptcp -sign -nochain -der -nocert -pin {password} "
-        "{f_in} {f_out} -thumbprint {thumbprint} 2>&1 >/dev/null")
+        "csptest -sfsign -sign -detached -in {f_in} -out {f_out} "
+        "-my {thumbprint} -password {password} 2>&1 >/dev/null")
     os.system(cmd.format(
         password=password,
         f_in=source_path,
