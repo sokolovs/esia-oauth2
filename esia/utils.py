@@ -112,14 +112,12 @@ def csp_sign(thumbprint, password, data):
     :param str password: пароль для контейнера закрытого ключа
     :param str data: подписываемые данные
     """
+    temp_dir = tempfile.gettempdir()
     source_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
     source_file.write(data)
     source_file.close()
     source_path = source_file.name
 
-    destination_file = tempfile.NamedTemporaryFile(mode='wb', delete=False)
-    destination_file.close()
-    destination_path = destination_file.name
 
     # cmd = (
     #     "cryptcp -sign -nochain -der -nocert -pin {password} "
@@ -133,20 +131,25 @@ def csp_sign(thumbprint, password, data):
     # csptest -sfsign -verify -detached -in signed_file.txt \
     #   -signature sign.p7b -my 16d9487839b629f327c659a854d5283e24accc2d
 
+    # cryptcp -signf -dir "/tmp" -der -strict -cert -detached -thumbprint "$thumbprint" -pin "$pin" "/tmp/message"
+
     cmd = (
-        "csptest -sfsign -sign -detached -in {f_in} -out {f_out} "
-        "-my {thumbprint} -password {password} 2>&1 >/dev/null")
+        "/opt/cprocsp/bin/cryptcp -signf -dir {temp_dir} -der -strict -cert -detached "
+        "-thumbprint {thumbprint} -pin {password} {f_in}")
 
     os.system(cmd.format(
+        temp_dir=temp_dir,
         password=password,
         f_in=source_path,
-        f_out=destination_path,
         thumbprint=thumbprint
     ))
 
-    signed_message = open(destination_path, 'rb').read()
+    f_out = f'{source_path}.sgn'
+    signed_message = open(f_out, 'rb').read()
     os.unlink(source_path)
-    os.unlink(destination_path)
+    os.unlink(f_out)
+
+
     return signed_message
 
 
