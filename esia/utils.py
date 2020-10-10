@@ -134,7 +134,7 @@ def csp_sign(thumbprint, password, data):
     # cryptcp -signf -dir "/tmp" -der -strict -cert -detached -thumbprint "$thumbprint" -pin "$pin" "/tmp/message"
 
     cmd = (
-        "/opt/cprocsp/bin/cryptcp -signf -dir {temp_dir} -der -strict -cert -detached "
+        "cryptcp -signf -dir {temp_dir} -der -strict -cert -detached "
         "-thumbprint {thumbprint} -pin {password} {f_in}")
 
     os.system(cmd.format(
