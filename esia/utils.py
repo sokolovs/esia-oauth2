@@ -112,35 +112,22 @@ def csp_sign(thumbprint, password, data):
     :param str password: пароль для контейнера закрытого ключа
     :param str data: подписываемые данные
     """
-    source_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
+    tmp_dir = tempfile.gettempdir()
+    source_file = tempfile.NamedTemporaryFile(
+        mode='w', delete=False, dir=tmp_dir)
     source_file.write(data)
     source_file.close()
     source_path = source_file.name
-
-    destination_file = tempfile.NamedTemporaryFile(mode='wb', delete=False)
-    destination_file.close()
-    destination_path = destination_file.name
-
-    # cmd = (
-    #     "cryptcp -sign -nochain -der -nocert -pin {password} "
-    #     "{f_in} {f_out} -thumbprint {thumbprint} 2>&1 >/dev/null")
-
-    # Create detached PKCS#7 sinature
-    # csptest -sfsign -sign -detached -in signed_file.txt -out sign.p7b \
-    #   -my 16d9487839b629f327c659a854d5283e24accc2d -password 1
-
-    # Verify detached PKCS#7 sinature
-    # csptest -sfsign -verify -detached -in signed_file.txt \
-    #   -signature sign.p7b -my 16d9487839b629f327c659a854d5283e24accc2d
+    destination_path = source_path + '.sgn'
 
     cmd = (
-        "csptest -sfsign -sign -detached -in {f_in} -out {f_out} "
-        "-my {thumbprint} -password {password} 2>&1 >/dev/null")
+        "cryptcp -signf -dir {tmp_dir} -der -strict -cert -detached "
+        "-thumbprint {thumbprint} -pin {password} {f_in} 2>&1 >/dev/null")
     os.system(cmd.format(
+        tmp_dir=tmp_dir,
+        thumbprint=thumbprint,
         password=password,
-        f_in=source_path,
-        f_out=destination_path,
-        thumbprint=thumbprint
+        f_in=source_path
     ))
 
     signed_message = open(destination_path, 'rb').read()
