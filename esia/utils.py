@@ -121,7 +121,7 @@ def csp_sign(thumbprint, password, data):
     destination_path = source_path + '.sgn'
 
     cmd = (
-        "cryptcp -signf -dir {tmp_dir} -der -strict -cert -detached "
+        "cryptcp -signf -norev -dir {tmp_dir} -der -strict -cert -detached "
         "-thumbprint {thumbprint} -pin {password} {f_in} 2>&1 >/dev/null")
     os.system(cmd.format(
         tmp_dir=tmp_dir,
