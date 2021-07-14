@@ -1,4 +1,4 @@
-cryptography==3.2
+cryptography==3.3.2
 PyJWT==1.4.2
 pytz==2016.4
 requests==2.21.0
